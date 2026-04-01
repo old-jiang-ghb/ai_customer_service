@@ -27,3 +27,5 @@ langchain-openai==0.3.3
 langchain_huggingface==0.1.0
 # redis
 redis==7.3
+# loki日志
+python-logging-loki== 0.3.1

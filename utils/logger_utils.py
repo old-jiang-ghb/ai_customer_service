@@ -2,7 +2,7 @@ import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
 from core import settings
-
+from logging_loki import LokiHandler
 # 日志存放目录
 LOG_DIR = settings.LOGGING_SAVE_DIR
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -27,10 +27,21 @@ handler.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 console_handler.setLevel(logging.INFO)
+loki_handler = LokiHandler(
+    url="http://localhost:3100/loki/api/v1/push",  # Loki 默认地址
+    tags={
+        "service": "ai_customer_service",  # 你的服务名
+        "env": "dev",                     # 环境
+        "app": "fastapi"                  # 应用类型
+    },
+    version="1"
+)
+loki_handler.setLevel(logging.INFO)
 
 # 全局 logger
-log = logging.getLogger("app")
+log = logging.getLogger("ai_customer_service")
 log.setLevel(logging.INFO)
 log.addHandler(handler)
 log.addHandler(console_handler)
+log.addHandler(loki_handler)
 log.propagate = False
