@@ -1,0 +1,29 @@
+dynaconf == 3.2.12 #用于读取配置
+fastapi == 0.135.1
+starlette == 0.52.1
+typing == 3.7.4.3
+python-jose == 3.5.0
+pydantic == 2.12.5
+sqlalchemy ==2.0.48
+passlib ==1.7.4
+# 使用bcrypt加密（5.0.0与passlib版本不兼容）
+bcrypt == 3.2.2
+uvicorn ==0.42.0
+pymysql ==1.1.2
+python-multipart ==0.0.22
+# 向量数据库
+pymilvus==2.5.6
+langchain-milvus == 0.1.9
+# 加载非结构化数据
+unstructured[docx,md] ==0.17.2
+langchain == 0.3.25
+langchain-community==0.3.3
+# langgraph-0.3.30 会默认下载langgraph-checkpoint-2.1.2 langgraph-prebuilt-0.1.8 langgraph-sdk-0.1.74 ormsgpack-1.12.2 xxhash-3.6.0
+langgraph == 0.3.30
+pandas == 3.0.1
+# 使用ai模型语义切割
+langchain_experimental ==0.3.3
+langchain-openai==0.3.3
+langchain_huggingface==0.1.0
+# redis
+redis==7.3

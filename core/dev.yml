@@ -1,0 +1,50 @@
+LOG_LEVEL: INFO
+HOST: 127.0.0.1
+PORT: 9001
+ORIGINS: ['http://localhost:8080', 'http://127.0.0.1:8080', 'http://192.168.0.136:8080']
+DATABASE:
+  DRIVER: mysql
+  NAME: ai_customer_service
+  HOST: 192.168.236.101
+  PORT: 3306
+  USERNAME: root
+  PASSWORD: PokeNight@163
+  QUERY:
+    charset: utf8mb4
+JWT_SECRET_KEY: 09d25e094fzxccs2556c818166b7a9563b93f7099f6f0f4caa6cf33b88e8d3e7
+ALGORITHM: HS256
+ACCESS_TOKEN_EXPIRE_MINUTES: 45
+
+WHITE_LIST: ['/api/user/login', '/api/user/register', '/static', '/docs', '/swagger', '/openapi', '/api/user/auth']
+#日志保存地址
+LOGGING_SAVE_DIR: "/data/logs/ai_customer_service"
+# openai embedding 使用的模型 text-embedding-3-small 或者 old：text-embedding-ada-002"
+OPENAI_TEXT_EMBEDDING_MODEL: "text-embedding-3-small"
+# milvus 集合名称 ：家具客服助手向量知识库
+FURNITURE_ASSISTANT_COLLECTION_NAME: "t_furniture_assistant"
+MILVUS_URI: "http://localhost:19530"
+# openai key
+OPENAI_API_KEY: ""
+# deepseek apikey
+DEEPSEEK_API_KEY: 'sk-d49a834da86b4cf1b79df6b714adfbb2'
+# 重写节点的重复次数
+REWRITE_COUNT: 1
+# 敏感词拦截后返回
+CONTENT_FILTER_RESULT: "抱歉，您的问题涉及不适宜内容(敏感词、暴力、血腥)，我无法回答，您可以咨询其他合规问题"
+# 首页用户咨询热词
+HOT_PROBLEM: ['坐垫价格','尺寸选择', '质保售后', '清洗保养', '配送安装', '退换政策', '适用人群', '优惠活动']
+# redis相关配置
+REDIS_HOST: "192.168.236.101"
+REDIS_PORT: 6379
+REDIS_PASSWORD: "123456"
+REDIS_DB: 0
+MAX_CONNECTIONS: 50
+# 从节点列表（读写分离用）
+SLAVE_HOSTS: [
+    {"host": "192.168.236.101", "port": 6380},
+    {"host": "192.168.236.101", "port": 6381},
+    {"host": "192.168.236.101", "port": 6382},
+]
+
+
+
