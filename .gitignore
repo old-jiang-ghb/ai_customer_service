@@ -1,0 +1,68 @@
+# 编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 依赖目录
+node_modules/
+vendor/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# 编译产物
+dist/
+build/
+out/
+target/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 日志
+logs/
+log/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 数据库
+*.db
+*.sqlite
+*.sqlite3
+
+# 大文件
+*.zip
+*.rar
+*.tar.gz
+*.7z
+*.iso
+
+# 模型、数据集、缓存
+*.bin
+*.pth
+*.pkl
+*.h5
+*.onnx
+models/
+model/
+checkpoints/
+*.cache
