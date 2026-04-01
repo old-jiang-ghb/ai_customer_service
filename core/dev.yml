@@ -26,7 +26,7 @@ MILVUS_URI: "http://localhost:19530"
 # openai key
 OPENAI_API_KEY: ""
 # deepseek apikey
-DEEPSEEK_API_KEY: 'sk-d49a834da86b4cf1b79df6b714adfbb2'
+DEEPSEEK_API_KEY: 'sk-d49a834da86b4cf1b79df6b714adf3'
 # 重写节点的重复次数
 REWRITE_COUNT: 1
 # 敏感词拦截后返回

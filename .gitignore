@@ -62,7 +62,6 @@ yarn-error.log*
 *.pkl
 *.h5
 *.onnx
-models/
 model/
 checkpoints/
 *.cache
