@@ -14,7 +14,7 @@ from core import settings
 from utils.logger_utils import log
 from utils.user_utils import get_real_ip
 from cache.rate_limit import RateLimiter
-
+from cache.redis_cache import RedisCache
 
 async def verify_token(request: Request, call_next: Callable) -> JSONResponse:
     # OAuth2的规范，如果认证失败，请求头中返回“WWW-Authenticate”
@@ -42,19 +42,16 @@ async def verify_token(request: Request, call_next: Callable) -> JSONResponse:
         token: str = authorization.split(' ')[1]
         try:
             # 校验token
-            res_dict = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM])
+            res_dict = RedisCache.get(token)
+            # 如果没有查到则返回错误
+            if not res_dict:
+                return auth_error
             sub = res_dict.get('sub').split(':')
             user_id = sub[0]
             username = sub[1]
             # 限流ip，防止攻击 1分钟100次
             if not RateLimiter.is_allowed(get_real_ip(request), 100):
                 return limit_error
-
-            # 判断是否超时
-            if not username:
-                return auth_error
-            if datetime.fromtimestamp(res_dict.get('exp')) < datetime.now():  # 超时了
-                return auth_error
             request.state.user_id = user_id
             request.state.username = username  # 把用户名绑定到request对象中
             return await call_next(request)
