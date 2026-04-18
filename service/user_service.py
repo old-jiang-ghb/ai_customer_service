@@ -7,6 +7,8 @@ from models.user import User
 from utils.password_hash_utils import get_hashed_password, verify_password
 from utils.jwt_utils import create_token
 from utils.checker_utils import Checker
+from cache.redis_cache import RedisCache
+
 class UserService:
     @staticmethod
     def get_user(db: Session, user_id: int):
@@ -44,7 +46,10 @@ class UserService:
             raise BusinessException(msg=f'用户:{username}未注册')
         if not verify_password(password, user.password):
             raise BusinessException(msg=f'登录密码错误')
-        return user, create_token(str(user.id) + ':' + user.username)
+        token = create_token(str(user.id) + ':' + user.username)
+        # 将用户信息保存到redis中
+        RedisCache.set(token, str(user.id) + ':' + user.username)
+        return user, token
 
 
 

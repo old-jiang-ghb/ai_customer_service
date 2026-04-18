@@ -60,7 +60,7 @@ class MilvusVectorStore:
             index_name="dense_inverted_index",
             index_type="HNSW",     # 稠密向量一般都用这个索引 (基于图实现的)
             metric_type="IP",       # 可以选择 IP（内积适合已经做了归一化的），COSINE（余弦相似度，适合没做归一化的），L2（欧式距离，适合坐标，位置，数值预测）
-            params={"M": 16, "efConstruction": 64}  # M :邻接节点数(M越大精度越高、内存越大), efConstruction: 搜索范围(越大建索引越慢、精度越高)，按需对这两个参数进行调优
+            params={"M": 16, "efConstruction": 64, "ef": 64}  # M :邻接节点数(M越大精度越高、内存越大), efConstruction: 搜索范围(越大建索引越慢、精度越高)，按需对这两个参数进行调优
         )
 
         if collection_name in milvus_client.list_collections():
