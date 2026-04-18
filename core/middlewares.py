@@ -8,13 +8,28 @@ from jose import jwt, ExpiredSignatureError
 from starlette import status
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-
+import uuid
 from utils.response_utils import ResponseUtils
 from core import settings
 from utils.logger_utils import log
 from utils.user_utils import get_real_ip
 from cache.rate_limit import RateLimiter
 from cache.redis_cache import RedisCache
+from utils.context_utils import trace_id_ctx
+
+async def add_trace_id(request: Request, call_next: Callable) -> JSONResponse:
+    # 1. 生成 trace_id
+    trace_id = str(uuid.uuid4())
+
+    # 2. 存入上下文（全局任何地方都能取！）
+    trace_id_ctx.set(trace_id)
+
+    # 3. 执行请求
+    response = await call_next(request)
+
+    # 4. 响应头带回
+    response.headers["X-Trace-ID"] = trace_id
+    return response
 
 async def verify_token(request: Request, call_next: Callable) -> JSONResponse:
     # OAuth2的规范，如果认证失败，请求头中返回“WWW-Authenticate”
@@ -80,6 +95,8 @@ def init_cors(app: FastAPI) -> None:
 def init_middleware(app: FastAPI) -> None:
 
     # 在app中注册中间件。 才能生效
+    # 增加trace_id
+    app.middleware("http")(add_trace_id)
     # 校验token
     app.middleware('http')(verify_token)
     # 跨域
