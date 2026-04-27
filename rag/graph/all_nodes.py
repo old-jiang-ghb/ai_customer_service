@@ -5,7 +5,7 @@ from core import settings
 from models.session_history import USER_HISTORY_TYPE, AI_HISTORY_TYPE
 from rag.graph import MyAgentState
 from rag.retriever.milvus_retriever import rrf_retriever
-from rag.llm.all_llm import get_client
+from rag.llm.all_llm import get_client,llm_deepseek_v4
 from rag.llm.all_llm import DEEPSEEK
 from utils.logger_utils import log
 from dao.session_history_dao import SessionHistoryDao
@@ -133,18 +133,32 @@ def generate(state: MyAgentState):
     context = "\n".join(state["retrieved_docs"])
     history_messages = state["history_messages"]
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "你是一个客服回复助手。请根据文档内容回答问题。注意涉及到内部价格计算不要透出给用户,给一个数字就行"
-                   "如果不知道答案，请直接说明。回答保持简洁,需要有客服的亲和力.文档:{context}"),
+        ("system", """
+            你是一个客服回复助手。请根据文档内容回答问题,注意涉及到内部价格计算不要透出给用户,给一个数字就行.
+
+            【重要】当用户询问价格时，你必须：
+            1. 关于价格计算，严格按照文档中的公式进行计算;
+            2. 可以分步计算，但最终只给用户答案;
+            3. 绝对禁止编造或估算价格，必须通过公式算出确切数字.
+            给你举个回复价格相关例子:50D，2*（130*65*18）多少钱？你好，50D，2*（130*65*18）总价是368元.
+            
+            如果不知道答案，请直接说明,不要胡乱给答案。回答保持简洁,需要有客服的亲和力.
+            文档内容：{context}"""
+        ),
         *history_messages,
         ("user", "{question}")
     ])
-    rsp = deepseek_llm.invoke(prompt.format_messages(question=question, context=context))
+    final_input = prompt.format_messages(question=question, context=context)
+    # 使用v4试试
+    rsp = llm_deepseek_v4.invoke(final_input)
     finish_reason = None
     if hasattr(rsp, "response_metadata"):
         finish_reason = rsp.response_metadata.get("Finish reason", "")
     if finish_reason is not None and finish_reason=='content_filter':
         log.warn(f"deepseek敏感词拦截，用户问题:{question}")
         return {"messages": [AIMessage(content= settings.CONTENT_FILTER_RESULT)]}
+    log.info(f"大模型输入:{final_input}")
+    log.info(f"大模型返回答案:{rsp}")
     return {"messages": [AIMessage(content=rsp.content)]}
 
 # 兜底节点

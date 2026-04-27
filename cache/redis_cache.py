@@ -8,7 +8,7 @@ class RedisCache:
     @classmethod
     def get(cls, unique: str):
         key = cls.PREFIX + unique
-        return redis.read().get(unique)
+        return redis.read().get(key)
 
     @classmethod
     def set(cls, unique: str, value: str, expire: int = EXPIRE):

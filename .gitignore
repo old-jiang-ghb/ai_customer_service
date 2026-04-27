@@ -15,7 +15,6 @@ vendor/
 venv/
 env/
 .env
-.env.*
 !.env.example
 
 # 编译产物

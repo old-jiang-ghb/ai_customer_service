@@ -106,7 +106,10 @@ class RagService:
             })
 
             final_answer = ""
+            count = 1
             for chunk in graph.stream(inputs, config):
+                log.info(f"graph流式输出[{count}]:{chunk}")
+                count+=1
                 if "generate" in chunk:
                     answer = chunk["generate"]["messages"][-1].content
                     final_answer = answer

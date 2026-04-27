@@ -5,7 +5,7 @@ ORIGINS: ['http://localhost:8080', 'http://127.0.0.1:8080', 'http://192.168.0.13
 DATABASE:
   DRIVER: mysql
   NAME: ai_customer_service
-  HOST: 192.168.236.101
+  HOST: 192.168.236.102
   PORT: 3306
   USERNAME: root
   PASSWORD: PokeNight@163
@@ -22,7 +22,7 @@ LOGGING_SAVE_DIR: "/data/logs/ai_customer_service"
 OPENAI_TEXT_EMBEDDING_MODEL: "text-embedding-3-small"
 # milvus 集合名称 ：家具客服助手向量知识库
 FURNITURE_ASSISTANT_COLLECTION_NAME: "t_furniture_assistant"
-MILVUS_URI: "http://localhost:19530"
+MILVUS_URI: "http://192.168.236.102:19530"
 # openai key
 OPENAI_API_KEY: ""
 # deepseek apikey
@@ -32,19 +32,21 @@ REWRITE_COUNT: 1
 # 敏感词拦截后返回
 CONTENT_FILTER_RESULT: "抱歉，您的问题涉及不适宜内容(敏感词、暴力、血腥)，我无法回答，您可以咨询其他合规问题"
 # 首页用户咨询热词
-HOT_PROBLEM: ['坐垫价格','尺寸选择', '质保售后', '清洗保养', '配送安装', '退换政策', '适用人群', '优惠活动']
+HOT_PROBLEM: ['核心材质','怎么退换货', '日常清洁', '清洗保养', '配送安装', '上楼服务', '软硬怎么选', '海绵坐垫怎么卖']
 # redis相关配置
-REDIS_HOST: "192.168.236.101"
+REDIS_HOST: "192.168.236.102"
 REDIS_PORT: 6379
 REDIS_PASSWORD: "123456"
 REDIS_DB: 0
 MAX_CONNECTIONS: 50
 # 从节点列表（读写分离用）
 SLAVE_HOSTS: [
-    {"host": "192.168.236.101", "port": 6380},
-    {"host": "192.168.236.101", "port": 6381},
-    {"host": "192.168.236.101", "port": 6382},
+    {"host": "192.168.236.102", "port": 6380},
+    {"host": "192.168.236.102", "port": 6381},
+    {"host": "192.168.236.102", "port": 6382},
 ]
+# 日志地址
+LOKI_URL: http://192.168.236.102:3100/loki/api/v1/push
 
 
 
