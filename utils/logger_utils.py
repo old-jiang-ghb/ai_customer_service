@@ -69,7 +69,7 @@ class LokiJsonFormatter(logging.Formatter):
 
 try:
     loki_handler = LokiHandler(
-        url="http://192.168.236.101:3100/loki/api/v1/push",
+        url=settings.LOKI_URL,
         tags={
             "service": "ai_customer_service",
             "env": "dev",

@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
-from sympy.strategies.core import switch
+from utils.env_utils import DEEPSEEK_BASE_URL,DEEPSEEK_API_KEY
 
 from core import settings
 # 大模型相关常量
@@ -25,6 +25,16 @@ ZHIPU_AI= 'zhipu'
 #     api_key=SecretStr(settings.DEEPSEEK_API_KEY),
 #     temperature=0.1,
 #     base_url='https://api.deepseek.com')
+
+# deepseek v4
+llm_deepseek_v4 = ChatOpenAI(
+    model="deepseek-v4-flash",  # 或 "deepseek-v4-pro"
+    api_key=SecretStr(DEEPSEEK_API_KEY),
+    base_url=DEEPSEEK_BASE_URL,
+    temperature=0.1,
+    # 推理强度（V4 专属，默认 high）
+    model_kwargs={"reasoning_effort": "high"}
+)
 
 def get_client(model_name: str = DEEPSEEK) -> ChatOpenAI:
     llm:ChatOpenAI | None = None

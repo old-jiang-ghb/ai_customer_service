@@ -58,10 +58,14 @@ async def verify_token(request: Request, call_next: Callable) -> JSONResponse:
         try:
             # 校验token
             res_dict = RedisCache.get(token)
-            # 如果没有查到则返回错误
+            if not res_dict:
+                res_dict = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM])
+                sub = res_dict.get('sub').split(':')
+            else :
+                sub = res_dict.split(':')
+            # 如果还是没有查到则返回错误
             if not res_dict:
                 return auth_error
-            sub = res_dict.get('sub').split(':')
             user_id = sub[0]
             username = sub[1]
             # 限流ip，防止攻击 1分钟100次
