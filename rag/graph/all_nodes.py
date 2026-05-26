@@ -2,7 +2,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from typing import Literal
 from core import settings
-from models.session_history import USER_HISTORY_TYPE, AI_HISTORY_TYPE
+from models.session_history import USER_HISTORY_TYPE, AI_HISTORY_TYPE, SessionHistory
 from rag.graph import MyAgentState
 from rag.retriever.milvus_retriever import rrf_retriever
 from rag.llm.all_llm import get_client,llm_deepseek_v4
@@ -149,7 +149,7 @@ def generate(state: MyAgentState):
         ("user", "{question}")
     ])
     final_input = prompt.format_messages(question=question, context=context)
-    # 使用v4试试
+    # 使用v4
     rsp = llm_deepseek_v4.invoke(final_input)
     finish_reason = None
     if hasattr(rsp, "response_metadata"):
@@ -163,6 +163,8 @@ def generate(state: MyAgentState):
 
 # 兜底节点
 def fallback_node(state: MyAgentState):
+    # 兜底节点需要将ai不能识别的数据进行存储
+    
     return {
         "messages": [
             AIMessage(content="非常抱歉，"
@@ -182,6 +184,38 @@ def score_router(state: MyAgentState) -> Literal["generate", "rewrite", "fallbac
         return "generate"
     else:
         return "rewrite"
+
+# 工作流结束后需要做的操作
+def end_node(state: MyAgentState):
+    db = state["db"]
+    session_id = state["session_id"]
+    question = state["question"]
+    messages = state["messages"]
+    # 入库逻辑
+    try:
+        # 用户的问题
+        SessionHistoryDao.create_session_history(db, SessionHistory(
+            session_id=session_id,
+            detail=question,
+            history_type=USER_HISTORY_TYPE
+        ))
+        # ai答复 将messages返过来进行读取，
+        for msg in reversed(messages):
+            # ai给的最终回复
+            if msg.type == "ai":
+                SessionHistoryDao.create_session_history(db, SessionHistory(
+                    session_id=session_id,
+                    detail=msg.content,
+                    history_type=AI_HISTORY_TYPE
+                ))
+                # 回写缓存
+                ChatHistoryCache.add_message(session_id, USER_HISTORY_TYPE, question)
+                ChatHistoryCache.add_message(session_id, AI_HISTORY_TYPE, msg.content)
+                break
+
+    except Exception as e:
+        print(f"用户聊天记录保存失败，session_id:{session_id},已回滚", e)
+        raise e
 
 # 是否进入工作流路由
 # def intent_router(state: MyAgentState) -> Literal["retrieve", "fallback"]:

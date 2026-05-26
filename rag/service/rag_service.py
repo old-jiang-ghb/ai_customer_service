@@ -1,5 +1,3 @@
-from langchain_core.runnables import RunnableConfig
-
 from cache.chat_cache import ChatHistoryCache
 from cache.hot_problem_cache import HotQACache
 from core.exception import BusinessException
@@ -13,8 +11,7 @@ from rag.vector_store.milvus_store import MilvusVectorStore
 from core import settings
 from core.database import get_db
 from utils.logger_utils import log
-from rag.graph.memory import CommonLongMemoryCheckPointSaver
-from rag.graph.customer_service_graph import build_ai_customer_service_graph
+from rag.graph.customer_service_graph import graph
 from dao.session_history_dao import SessionHistoryDao
 
 # 向量知识库service
@@ -84,10 +81,6 @@ class RagService:
                 yield answer
                 db.commit()
                 return
-
-            # 长期记忆
-            memory_saver = CommonLongMemoryCheckPointSaver(db)
-            graph = build_ai_customer_service_graph().compile(checkpointer=memory_saver)
             inputs = {
                 "question": question,
                 "rewritten_question": "",
@@ -100,14 +93,9 @@ class RagService:
                 "session_id": current_session_id
             }
 
-            config = RunnableConfig(configurable={
-                "thread_id": current_session_id,
-                "question": question
-            })
-
             final_answer = ""
             count = 1
-            for chunk in graph.stream(inputs, config):
+            for chunk in graph.stream(inputs):
                 log.info(f"graph流式输出[{count}]:{chunk}")
                 count+=1
                 if "generate" in chunk:
