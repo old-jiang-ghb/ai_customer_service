@@ -7,9 +7,10 @@ from sqlalchemy.orm import Session
 from cache.chat_cache import ChatHistoryCache
 from dao.session_history_dao import SessionHistoryDao
 from models.session_history import SessionHistory, USER_HISTORY_TYPE, AI_HISTORY_TYPE
-
+from warnings import deprecated
 
 # 自定义通用长期记忆 Checkpoint ， 对接mysql数据库
+@deprecated("该长期记忆已废弃")
 class CommonLongMemoryCheckPointSaver(BaseCheckpointSaver):
     def __init__(self, db: Session):
         super().__init__()

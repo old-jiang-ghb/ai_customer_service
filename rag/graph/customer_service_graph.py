@@ -2,7 +2,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
 
 from rag.graph import MyAgentState
-from rag.graph.all_nodes import (score_router, fallback_node,generate,rewrite_question,score_node
+from rag.graph.all_nodes import (score_router, fallback_node,generate,rewrite_question,score_node, end_node
 ,retrieve_node,init_node)
 import uuid
 
@@ -23,6 +23,9 @@ def build_ai_customer_service_graph() -> StateGraph:
     workflow.set_entry_point("init")
     workflow.add_edge("init", "retrieve")
     workflow.add_edge("retrieve", "score")
+    # 输出节点指定到最终处理节点
+    workflow.add_edge("generate", "end_node")
+    workflow.add_edge("fallback", "end_node")
     # 增加评分完成后的条件路由
     workflow.add_conditional_edges(
         "score",
@@ -34,9 +37,11 @@ def build_ai_customer_service_graph() -> StateGraph:
         }
     )
     workflow.add_edge("rewrite", "retrieve")
-    workflow.add_edge("generate", END)
-    workflow.add_edge("fallback", END)
+    workflow.add_edge("end_node", END)
     return workflow
+
+# 单例
+graph = build_ai_customer_service_graph().compile()
 
 if __name__ == "__main__":
     graph = build_ai_customer_service_graph()

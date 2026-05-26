@@ -29,3 +29,5 @@ langchain_huggingface==0.1.0
 redis==7.3
 # loki日志
 python-logging-loki== 0.3.1
+# dubbo
+apache-dubbo==3.0.0b1
